@@ -18,6 +18,8 @@ class RvyOptionUI {
 	private $def_otype_options;
 	private $display_hints = true;
 
+	var $integrations = [];
+
 	public static function instance($args = [])
     {
         if (is_null(self::$instance)) {
@@ -25,7 +27,7 @@ class RvyOptionUI {
         }
 
         return self::$instance;
-    }
+	}
 
     private function __construct($args = [])
     {
@@ -35,27 +37,50 @@ class RvyOptionUI {
 		$this->sitewide = $args['sitewide'];
 		$this->customize_defaults = $args['customize_defaults'];
 		$this->display_hints = rvy_get_option( 'display_hints' );
+
+		$this->loadIntegrations();
     }
 
-	function tooltipText($display_text, $tip_text, $use_icon = false) {
-		$icon = '';
+	private function loadIntegrations() {
+		$int = [];
 		
-		if ($use_icon) :
-			ob_start();
-		?>
-			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 50 50" style="margin-left: 3px; vertical-align: baseline;">
-				<path d="M 25 2 C 12.264481 2 2 12.264481 2 25 C 2 37.735519 12.264481 48 25 48 C 37.735519 48 48 37.735519 48 25 C 48 12.264481 37.735519 2 25 2 z M 25 4 C 36.664481 4 46 13.335519 46 25 C 46 36.664481 36.664481 46 25 46 C 13.335519 46 4 36.664481 4 25 C 4 13.335519 13.335519 4 25 4 z M 25 11 A 3 3 0 0 0 25 17 A 3 3 0 0 0 25 11 z M 21 21 L 21 23 L 23 23 L 23 36 L 21 36 L 21 38 L 29 38 L 29 36 L 27 36 L 27 21 L 21 21 z"></path>
-			</svg>
-		<?php 
-			$icon = ob_get_clean();
-		endif;
-		
-		return '<span data-toggle="tooltip" data-placement="top"><span class="tooltip-text"><span>' 
-		. $tip_text
-		. '</span><i></i></span>'
-		. $display_text
-		. $icon
-		. '</span>';
+		if (defined('FL_BUILDER_VERSION')) {
+			$int['beaver-builder'] = true;
+		}
+
+		if (defined('ET_BUILDER_PLUGIN_VERSION') || (false !== stripos(get_template(), 'divi'))) {
+			$int['divi'] = true;
+		}
+
+		if (defined('ELEMENTOR_VERSION') && !defined('RVY_DISABLE_ELEMENTOR_INTEGRATION')) {
+			$int['elementor'] = true;
+		}
+
+		if (defined('ICL_SITEPRESS_VERSION')) {
+			$int['wpml'] = true;
+		}
+
+		if (defined('WPML_TM_VERSION')) {
+			$int['wpml-tm'] = true;
+		}
+
+		if (class_exists('WooCommerce')) {
+			$int['woocommerce'] = true;
+		}
+
+		if (defined('POLYLANG_VERSION')) {
+			$int['polylang'] = true;
+		}
+
+		if (class_exists('ACF_VERSION')) {
+			$int['acf'] = true;
+		}
+
+		if (class_exists('ACFE')) {
+			$int['acfe'] = true;
+		}
+
+		$this->integrations = $int;
 	}
 
 	function option_checkbox( $option_name, $tab_name, $section_name, $hint_text, $unused_arg = '', $args = '') {
@@ -146,6 +171,7 @@ $this->section_captions = array(
 		'working_copy'			=> esc_html__('New Revisions', 'revisionary'),
 		'preview'				=> esc_html__('Preview', 'revisionary'),
 		'revisions'				=> esc_html__('Options', 'revisionary'),
+		// 'integrations'			=> esc_html__('Integrations', 'revisionary'),
 	)
 );
 
@@ -233,6 +259,7 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'working_copy' =>		 ['copy_posts_capability', 'revisor_role_add_custom_rolecaps', 'revision_limit_per_post', 'revision_limit_compat_mode', 'revision_unfiltered_html_check', 'auto_submit_revisions', 'caption_copy_as_edit', 'permissions_compat_mode', 'pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date', 'scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'wp_cron_usage_detected', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'rev_publication_delete_ed_comments', 'revision_statuses_noun_labels', 'manage_unsubmitted_capability', 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions', 'deletion_queue', 'use_publishpress_notifications', 'planner_notifications_access_limited', 'pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer', 'compare_revisions_direct_approval'],
 	'preview' =>			 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'home_preview_set_home_flag'],
 	'revisions'		=>		 ['require_edit_others_drafts', 'diff_display_strip_tags', 'display_hints', 'delete_settings_on_uninstall'],
+	'integrations' =>		 [true],
 	'license' =>			 ['edd_key'],
 ]
 ]);
@@ -414,6 +441,10 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 			<a href="#ppr-tab-<?php echo esc_attr($section_name) ?>">
 				<?php echo esc_html($label) ?>
 			</a>
+
+			<?php if (('integrations' == $section_name) && !empty($this->integrations)) :?>
+				<span class="pp-integrations <?php echo (defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) ? 'pp-integrations-active' : 'pp-integrations-missing';?> count-<?php echo intval(count($this->integrations));?>"><span class="plugin-count"><?php echo intval(count($this->integrations));?></span></span>
+			<?php endif;?>
 		</li>
 		<?php
 			if (empty($setActiveTab)) {
@@ -467,7 +498,7 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 		<td style="padding-right: 100px">
 		<h3 style="margin-top:0; margin-bottom:8px"><?php esc_html_e('Past Revisions', 'revisionary');?>
         <?php 
-		echo $this->tooltipText(
+		echo $revisionary->admin->tooltipText(
 			'',
 			__('Past Revisions are earlier versions of a post. They are listed in the Revision Archive.', 'revisionary'),
 			true
@@ -504,7 +535,7 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 				<input name="<?php echo esc_attr($name); ?>" type="hidden" value="0"/>
 				<label for="<?php echo esc_attr($id); ?>">
 					<?php if (!empty($locked_types[$key])):
-						echo $this->tooltipText(
+						echo $revisionary->admin->tooltipText(
 							'<input name="' . esc_attr($name) . '" type="checkbox" id="' . esc_attr($id) . '" value="0" disabled />',
 							esc_html__('This post type does not support Past Revisions.', 'revisionary')
 						);
@@ -546,7 +577,7 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 		<td>
 		<h3 style="margin-top:0; margin-bottom:8px"><?php esc_html_e('New Revisions', 'revisionary');?>
 		<?php 
-		echo $this->tooltipText(
+		echo $revisionary->admin->tooltipText(
 			'',
 			__('New Revisions are changes which are not yet published. They are listed in the Revision Queue.', 'revisionary'),
 			true
@@ -739,7 +770,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			$cap_caption = sprintf(__('%s capability', 'revisionary'), 'restore_revisions');
 
 			if (rvy_get_option('revision_restore_require_cap')) {
-				$link = $this->tooltipText(
+				$link = $revisionary->admin->tooltipText(
 					"<a href='$url'>" . $cap_caption . '</a>',
 					__('Assign capability to roles', 'revisionary')
 				);
@@ -842,7 +873,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		$cap_caption = __('Create Revision capabilities', 'revisionary');
 
 		if (rvy_get_option('copy_posts_capability')) {
-			$link = $this->tooltipText(
+			$link = $revisionary->admin->tooltipText(
 				"<a href='$url'>" . $cap_caption . '</a>',
 				__('Assign capabilities to roles', 'revisionary')
 			);
@@ -867,7 +898,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			$hint .= ' ' . sprintf(
 				__('To expand the Pages list, assign %s.', 'revisionary'),
 				
-				$this->tooltipText(
+				$revisionary->admin->tooltipText(
 					"<a href='$url'>" . __('Listing capabilities', 'revisionary') . '</a>',
 					__('Assign capabilities to roles', 'revisionary')
 				)
@@ -892,7 +923,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		$cap_caption = sprintf(__('%s capability', 'revisionary'), 'unfiltered_html');
 
 		if (rvy_get_option('revision_unfiltered_html_check')) {
-			$link = $this->tooltipText(
+			$link = $revisionary->admin->tooltipText(
 				"<a href='$url'>" . $cap_caption . '</a>',
 				__('Assign capability to roles', 'revisionary')
 			);
@@ -995,7 +1026,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 				$cap_caption = __('Submit Revision capabilities', 'revisionary');
 
 				if (rvy_get_option('revise_posts_capability')) {
-					$link = $this->tooltipText(
+					$link = $revisionary->admin->tooltipText(
 						"<a href='$url'>" . $cap_caption . '</a>',
 						__('Assign capabilities to roles', 'revisionary')
 					);
@@ -1098,7 +1129,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 				$cap_caption = sprintf(__('%s capability', 'revisionary'), 'manage_unsubmitted_revisions');
 
 				if (rvy_get_option('manage_unsubmitted_capability')) {
-					$link = $this->tooltipText(
+					$link = $revisionary->admin->tooltipText(
 						"<a href='$url'>" . $cap_caption . '</a>',
 						__('Assign capability to roles', 'revisionary')
 					);
@@ -1124,7 +1155,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 				$cap_caption = sprintf(__('%s capability', 'revisionary'), 'edit_others_revisions');
 
 				if (rvy_get_option('revisor_lock_others_revisions')) {
-					$link = $this->tooltipText(
+					$link = $revisionary->admin->tooltipText(
 						"<a href='$url'>" . $cap_caption . '</a>',
 						__('Assign capability to roles', 'revisionary')
 					);
@@ -1152,7 +1183,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 				$cap_caption = sprintf(__('%s capability', 'revisionary'), 'list_others_revisions');
 
 				if (rvy_get_option('revisor_hide_others_revisions')) {
-					$link = $this->tooltipText(
+					$link = $revisionary->admin->tooltipText(
 						"<a href='$url'>" . $cap_caption . '</a>',
 						__('Assign capability to roles', 'revisionary')
 					);
@@ -1569,7 +1600,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			$cap_caption = sprintf(__('%s capability', 'revisionary'), 'edit_others_drafts');
 
 			if (rvy_get_option('require_edit_others_drafts')) {
-				$link = $this->tooltipText(
+				$link = $revisionary->admin->tooltipText(
 					"<a href='$url'>" . $cap_caption . '</a>',
 					__('Assign capability to roles', 'revisionary')
 				);
@@ -1624,8 +1655,19 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	</div></td></tr></table>
 	<?php endif; // any options accessable in this section
 
-?>
 
+	$section = 'integrations';			// --- INTEGRATIONS SECTION ---
+
+	/*if ( ! empty( $this->form_options[$tab][$section] ) ) :*/?>
+		<table class="form-table rs-form-table" id="<?php echo esc_attr("ppr-tab-$section");?>"<?php echo ($setActiveTab != $section) ? ' style="display:none;"' : '' ?>><tr><td><div class="rvy-opt-wrap">
+
+		<?php
+			do_action('revisionary_integrations_ui', $this);
+		?>
+
+		</div></td></tr></table>
+	<?php /*endif;*/ // any options accessable in this section
+	?>
 </div>
 
 </div>
