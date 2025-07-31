@@ -1,3 +1,68 @@
+body.revisionary-settings #side-info-column {
+  padding-top: 44px;
+}
+
+.pp-revisions-pro-promo-right-sidebar .meta-box-sortables > :first-child {
+  display: none;
+}
+
+.pp-revisions-pro-promo-right-sidebar .meta-box-sortables > :first-child,
+.pp-revisions-pro-promo-right-sidebar #postbox-container-pp .meta-box-sortables > :first-child {
+  display: none;
+}
+
+#ppr-tab-working_copy .planner-notif-link {
+  text-decoration: underline !important;
+}
+
+#rvy-features .pp-promo-upgrade-notice {
+  margin: 10px 0 20px 30px;
+  text-align: center;
+  background: #655897;
+  padding: 0 20px 20px 20px;
+  border-radius: 6px;
+  width: 400px;
+  box-sizing: border-box;
+  box-shadow: 0 0 25px #ccc;
+  color: white;
+}
+
+#ppr-tab-statuses .pp-promo-upgrade-notice,
+#ppr-tab-notifications .pp-promo-upgrade-notice
+{
+  width: 475px;
+}
+
+.notifications .pp-promo-upgrade-notice {
+  width: 400px !important;
+}
+
+#rvy-features .pp-promo-upgrade-notice a {
+  font-size: 14px;
+  background: #FCB223;
+  color: #000;
+  font-weight: normal;
+  text-decoration: none;
+  padding: 9px 12px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  border: 1px solid #fca871;
+  break-inside: avoid;
+  white-space: nowrap;
+}
+
+#rvy-features .pp-promo-upgrade-notice a:hover {
+  color: #000;
+  background: #fcca46;
+}
+
+#rvy-features .pp-promo-upgrade-notice p {
+  display: inline-flex;
+  margin-top: 20px;
+}
+
 .pp-integrations-container {
   max-width: 100%;
   margin: 0;
@@ -28,6 +93,33 @@
 .pp-pro-badge-banner {
   font-size: 0.9rem;
 }
+#ppr-tab-statuses .pp-pro-badge-banner,
+#ppr-tab-notifications .pp-pro-badge-banner
+{
+  background: #FEB123;
+  color: #000000 !important;
+  font-weight: normal;
+  text-decoration: none;
+  padding: 6px 10px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  border: 1px solid #fca871;
+  break-inside: avoid;
+  white-space: nowrap;
+  max-width: 170px;
+}
+.pp-pro-badge-banner a {
+  color: #000000 !important;
+}
+.pp-pro-badge-banner:hover {
+  background-color: #F3AC04 !important;
+  border-color: #C58C07;
+  color: #333;
+  text-decoration: none !important;
+  text-shadow: none;
+}
 .pp-category-labels {
   display: flex;
   flex-wrap: wrap;
@@ -44,7 +136,7 @@
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid transparent;
-  user-select: none;
+  user-select: nne;
 }
 .pp-category-label:hover {
   background-color: #e1bee7;
@@ -75,15 +167,56 @@
   transition: transform 0.2s, box-shadow 0.2s;
   border-left: 4px solid #68589b;
 }
+#ppr-tab-statuses .pp-integration-card,
+#ppr-tab-notifications .pp-integration-card
+{
+  border-left: initial;
+  padding: 0;
+}
+#ppr-tab-statuses .pp-upgrade-overlay,
+#ppr-tab-notifications .pp-upgrade-overlay
+{
+  vertical-align: top;
+  padding-top: 50px;
+}
+#ppr-tab-statuses .pp-upgrade-overlay p,
+#ppr-tab-notifications .pp-upgrade-overlay p
+{
+  margin-top: 5px;
+  margin-bottom: 10px !important;
+  max-width: 550px;
+}
+#ppr-tab-statuses .pp-upgrade-overlay h4, 
+#ppr-tab-notifications .pp-upgrade-overlay h4 
+{
+  font-size: 18px;
+}
+#ppr-tab-statuses .pp-upgrade-overlay p,
+#ppr-tab-statuses .pp-upgrade-overlay a,
+#ppr-tab-notifications .pp-upgrade-overlay p,
+#ppr-tab-notifications .pp-upgrade-overlay a
+{
+  font-size: 16px;
+}
+#ppr-tab-statuses .pp-upgrade-overlay a,
+#ppr-tab-notifications .pp-upgrade-overlay a 
+{
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
 .pp-integration-card.pp-disabled {
   border-left-color: #e0e0e0;
-  opacity: 0.85;
+  color: #333;
+  min-height: 150px;
+}
+.pp-integration-card.pp-free {
+  min-height: initial;
 }
 .pp-integration-card.pp-disabled .pp-integration-icon {
   background-color: #f5f5f5;
 }
 .pp-integration-card.pp-disabled .pp-integration-icon::before {
-  color: #bdbdbd;
+  color: #333;
 }
 .pp-integration-card.pp-disabled .pp-integration-title {
   color: #1e1e1e;
@@ -93,19 +226,22 @@
   opacity: 0.7;
 }
 .pp-integration-card.pp-disabled .pp-toggle-label {
-  color: #757575;
+  color: #333;
 }
 .pp-integration-card.pp-disabled .pp-integration-features li:before {
-  color: #bdbdbd;
+  color: #333;
 }
 .pp-integration-card.pp-available {
   border: 1px solid #68589b;
+  color: #333;
 }
 .pp-integration-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
-.pp-integration-card:hover .pp-upgrade-overlay {
+.pp-integration-card:hover .pp-upgrade-overlay,
+.pp-promo-card:hover .pp-upgrade-overlay
+{
   opacity: 1;
   pointer-events: auto;
 }
@@ -310,7 +446,70 @@
   background-repeat: no-repeat;
   vertical-align: middle;
 }
+.pp-integration-icon.capabilities::before {
+  content: "";
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background-image: url("../common/img/capabilities.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+.pp-integration-icon.authors::before {
+  content: "";
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background-image: url("../common/img/authors.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+.pp-integration-icon.revisions::before {
+  content: "";
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background-image: url("../common/img/revisions.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+.pp-integration-icon.planner::before {
+  content: "";
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background-image: url("../common/img/planner.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+.pp-integration-icon.checklists::before {
+  content: "";
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background-image: url("../common/img/checklists.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+.pp-integration-icon.taxopress::before {
+  content: "";
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background-image: url("../common/img/taxopress.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
 
+.pp-integration-icon-wrap {
+  min-width: 100px;
+}
 .pp-integration-content {
   flex: 1;
 }
@@ -361,8 +560,20 @@
   background-color: #ffa726;
   color: white;
 }
-.pp-pro-badge {
-  background: #6950bd;
+.pp-tag-admin {
+  background-color: #858a8a;
+  color: white;
+}
+.pp-tag-events {
+  background-color: #674c0a;
+  color: white;
+}
+.pp-tag-workflow {
+  background-color: #68589b;
+  color: white;
+}
+
+.pp-badge {
   color: white;
   font-size: 11px;
   padding: 3px 6px;
@@ -372,15 +583,18 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
+.pp-pro-badge {
+  background: #6950bd;
+}
 .pp-integration-description {
-  color: #757575;
+  color: #333;
   font-size: 0.9rem;
   margin-bottom: 1rem;
   line-height: 1.5;
 }
 .pp-integration-features {
   font-size: 0.85rem;
-  color: #757575;
+  color: #333;
   margin-top: 0.5rem;
 }
 .pp-available .pp-integration-features {
@@ -423,7 +637,7 @@ input:disabled + .pp-slider {
 }
 .pp-toggle-label {
   font-size: 0.8rem;
-  color: #757575;
+  color: #333;
 }
 .pp-integration-status {
   display: inline-block;
@@ -467,7 +681,7 @@ input:disabled + .pp-slider {
   font-size: 16px;
 }
 .pp-upgrade-overlay p {
-  color: #757575;
+  color: #333;
   margin-bottom: 10px !important;
   max-width: 300px;
   line-height: 1.4;
@@ -521,7 +735,6 @@ input:disabled + .pp-slider {
   border-radius: 8px;
   padding: 0;
   text-align: center;
-  margin-top: 5px;
   margin-bottom: 10px;
   color: white;
 }
@@ -539,7 +752,7 @@ input:disabled + .pp-slider {
 .pp-integrations-upgrade-cta .pp-upgrade-btn {
   background: #FEB123;
   color: #000000 !important;
-  font-weight: 600;
+  font-weight: normal;
   text-decoration: none;
   padding: 8px 12px;
   -webkit-border-radius: 4px;
