@@ -57,7 +57,7 @@ class RevisionaryHistory
                 $parent_post = get_post($_post->post_parent);
 
                 if (($parent_post && !$revisionary->canEditPost($parent_post))
-                || (rvy_get_option('revision_restore_require_cap') && !current_user_can('administrator') && !is_super_admin() && !current_user_can('restore_revisions'))
+                || (rvy_get_option('revision_restore_require_cap') && !is_content_administrator_rvy() && !current_user_can('restore_revisions'))
                 ) :
         ?>
                     <style type='text/css'>
@@ -72,6 +72,10 @@ class RevisionaryHistory
 
     function actCopyButtons() {
         global $revisionary;
+
+        if (rvy_get_option('compare_revisions_hide_copy_buttons')) {
+            return;
+        }
 
         ?>
         <script type="text/javascript">
@@ -290,10 +294,14 @@ class RevisionaryHistory
             if (!empty($do_h1)) {
                 $status_plural = (!empty($status_obj->labels->plural)) ? $status_obj->labels->plural : __('Revisions');
 
+                if (!$url = get_edit_post_link($published_post)) {
+                    $url = '';
+                }
+
                 printf( 
                     esc_html__( 'Compare %s of "%s"', 'revisionary' ), 
                     esc_html($status_plural), 
-                    '<a href="' . esc_url(get_edit_post_link($published_post)) . '">' . esc_html(_draft_or_post_title($published_post)) . '</a>'
+                    '<a href="' . esc_url($url) . '">' . esc_html(_draft_or_post_title($published_post)) . '</a>'
                 );
             }
             ?>
@@ -1297,7 +1305,7 @@ class RevisionaryHistory
             $can_edit = current_user_can($edit_published_cap);
         }
 
-        $show_preview_link = rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin();
+        $show_preview_link = rvy_get_option('revision_preview_links') || is_content_administrator_rvy();
 
         if ($show_preview_link) {
             $preview_label = (empty($type_obj) || $can_edit)

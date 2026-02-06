@@ -89,7 +89,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$this->correctCommentCounts();
 
-		if (!defined('REVISIONARY_DISABLE_WP_CRON_RESTORATION') && rvy_get_option('scheduled_revisions') && rvy_get_option('scheduled_publish_cron')) {
+		if (!defined('REVISIONARY_DISABLE_WP_CRON_RESTORATION') && rvy_get_option('scheduled_revisions', -1, false, ['condition_check' => true]) && rvy_get_option('scheduled_publish_cron')) {
 			add_action('admin_footer', [$this, 'act_reschedule_missed_cron_revisions']);
 		}
 
@@ -292,7 +292,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 		
 		$status_col = ($permissions_compat_mode) ? 'post_status' : 'post_mime_type';
 
-		if ( isset($q['post_status']) && rvy_is_revision_status( $q['post_status'] ) ) {
+		if ( isset($q['post_status']) && rvy_is_revision_status( $q['post_status'] )) {
 			$qr[$status_col] = [$q['post_status']];
 		} else {
 			$qr[$status_col] = rvy_revision_statuses();
@@ -411,7 +411,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 	function pre_query_where_filter($where, $args = []) {
 		global $wpdb, $current_user, $revisionary;
 
-		if (!current_user_can('administrator') && empty($args['suppress_author_clause']) && empty($_REQUEST['post_author'])) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if (!is_content_administrator_rvy() && empty($args['suppress_author_clause']) && empty($_REQUEST['post_author'])) {	//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			if (rvy_get_option('revisor_hide_others_revisions') && !current_user_can('list_others_revisions') ) {
 			
 				$p = (!empty($args['alias'])) ? $args['alias'] : $wpdb->posts;
@@ -460,7 +460,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 	function revisions_where_filter($where, $args = []) {
 		global $wpdb, $current_user, $revisionary;
-		
+
 		$p = (!empty($args['alias'])) ? sanitize_text_field($args['alias']) : $wpdb->posts;
 
 		$is_count_query = empty($args['revision_query']);
@@ -558,7 +558,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		$own_posts_csv = implode("','", array_map('intval', $own_posts));
 
-		if (rvy_get_option('revisor_hide_others_revisions') && !current_user_can('administrator') 
+		if (rvy_get_option('revisor_hide_others_revisions') && !is_content_administrator_rvy()
 			&& !current_user_can('list_others_revisions') && empty($args['suppress_author_clause']) 
 		) {
 			$allow_post_types = apply_filters('revisionary_queue_allow_post_types', []);
@@ -1185,14 +1185,25 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 			) . '&nbsp;';
 		}
 
+		$revision_statuses = rvy_revision_statuses(['output' => 'object']);
+
 		$all_count = 0;
-		foreach($revision_statuses as $status) {
+
+		foreach($revision_statuses as $status_obj) {
+			$status = (!empty($status_obj->name)) ? $status_obj->name : '';
+			
+			if (empty($status)) {
+				continue;
+			}
+
 			if (!isset($num_posts->$status)) {
 				$num_posts->$status = 0;
 			}
 
 			if (!empty($num_posts->$status)) {
-				$status_obj = get_post_status_object($status);
+				if (!is_object($status_obj)) {
+					$status_obj = get_post_status_object($status);
+				}
 
 				$status_label = $status_obj ? sprintf(
 					translate_nooped_plural( $status_obj->label_count, $num_posts->$status ),
@@ -1302,13 +1313,20 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		echo "</select>";
 
-
 		$revision_statuses = rvy_revision_statuses(['output' => 'object']);
 
 		echo '<select name="post_status' . $two . '" id="post_status" style="float:none">';
-		echo '<option value="">' . __( 'Select Post Status...' ) . "</option>\n";
+		echo '<option value="">' . __('All Revision Statuses', 'revisionary') . "</option>\n";
 
-		foreach($revision_statuses as $status_obj) {
+		foreach($revision_statuses as $k => $status_obj) {
+			if (!is_object($status_obj)) {
+				$status_obj = get_post_status_object($k);
+			}
+
+			if (!is_object($status_obj)) {
+				continue;
+			}
+
 			$selected = (!$two && (!empty($_REQUEST['post_status'])) && ($status_obj->name == sanitize_key($_REQUEST['post_status']))) ? ' selected' : '';
 			echo "\t" . '<option value="' . esc_attr($status_obj->name) . '"' . $selected . '>' . $status_obj->label . "</option>\n";
 		}
@@ -1642,7 +1660,7 @@ class Revisionary_List_Table extends WP_Posts_List_Table {
 
 		if ( is_post_type_viewable( $post_type_object ) ) {
 			if ($can_read_post && $post_type_object && !empty($post_type_object->public)) {
-				if (rvy_get_option('revision_preview_links') || current_user_can('administrator') || is_super_admin()) {
+				if (rvy_get_option('revision_preview_links') || is_content_administrator_rvy()) {
 					do_action('pp_revisions_get_post_link', $post->ID);
 
 					$preview_link = rvy_preview_url($post);

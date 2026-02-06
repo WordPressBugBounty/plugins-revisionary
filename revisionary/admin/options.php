@@ -175,15 +175,16 @@ $pp_notif_url = admin_url('edit.php?post_type=psppnotif_workflow');
 $this->option_captions = apply_filters('revisionary_option_captions',
 	[
 	'revision_statuses_noun_labels' =>			esc_html__('Use alternate labeling: "Working Copy" > "Change Request" > "Scheduled Change"', 'revisionary'),
-	'revision_queue_capability' =>				esc_html__("Revision Queue access requires role capability", 'revisionary'),
+	'revision_queue_capability' =>				esc_html__("New Revisions access requires role capability", 'revisionary'),
 	'manage_unsubmitted_capability' =>			sprintf(esc_html__('Managing %s requires role capability', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
 	'copy_posts_capability' =>					rvy_get_option('revision_statuses_noun_labels') ? esc_html__("Working Copy creation requires role capability", 'revisionary') : esc_html__("Revision creation requires role capability", 'revisionary'),
 	'caption_copy_as_edit' =>					sprintf(esc_html__('Posts / Pages list: Use "Edit" caption for %s link', 'revisionary'), pp_revisions_status_label('draft-revision', 'submit_short')),
 	'pending_revisions' => 						sprintf(esc_html__('Enable %s', 'revisionary'), $pending_revision_plural),
 	'revision_limit_per_post' =>				esc_html__("Limit to one active revision per post", 'revisionary'),
-	'revision_limit_compat_mode' =>				esc_html__('Refresh "Has Revision" flag before suppressing New Revision', 'revisionary'),
+	'revision_limit_compat_mode' =>				esc_html__('Refresh "Has Revision" flag before suppressing Create Revision', 'revisionary'),
 	'revision_unfiltered_html_check' =>			esc_html__("If post contains custom html, require unfiltered_html capability", 'revisionary'),
 	'auto_submit_revisions' =>					esc_html__("Auto-submit revisions created by a user with publishing capability", 'revisionary'),
+	'auto_submit_revisions_any_user' =>			esc_html__("Auto-submit revisions", 'revisionary'),
 	'scheduled_revisions' => 					sprintf(esc_html__('Enable %s', 'revisionary'), pp_revisions_status_label('future-revision', 'plural')),
 	'revise_posts_capability' =>				rvy_get_option('revision_statuses_noun_labels') ? esc_html__("Change Request submission require role capability", 'revisionary') : esc_html__("Revision submission requires role capability", 'revisionary'),
 	'revisor_lock_others_revisions' =>			esc_html__("Editing others' Revisions requires role capability", 'revisionary'),
@@ -192,6 +193,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'revision_update_notifications' =>			esc_html__('Also notify on Revision Update', 'revisionary'),
 	'trigger_post_update_actions' => 			esc_html__('Apply API actions to mimic Post Update', 'revisionary'),
 	'diff_display_strip_tags' => 				esc_html__('Hide html tags on Compare screen', 'revisionary'),
+	'compare_revisions_hide_copy_buttons' => 	esc_html__('Hide copy buttons on Compare screen', 'revisionary'),
 	'scheduled_publish_cron' =>					esc_html__('Use WP-Cron scheduling', 'revisionary'),
 	'wp_cron_usage_detected' =>					esc_html__('Site uses a custom trigger for WP-Cron tasks', 'revisionary'),
 	'async_scheduled_publish' => 				esc_html__('Asynchronous Publishing', 'revisionary'),
@@ -221,7 +223,7 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'compare_revisions_direct_approval' => 		esc_html__('Approve Button on Compare screen', 'revisionary'),
 	'copy_revision_comments_to_post' => 		esc_html__('Copy revision comments to published post', 'revisionary'),
 	'past_revisions_order_by' =>				esc_html__('Compare Past Revisions ordering:', 'revisionary'), 
-	'list_unsubmitted_revisions' => 			sprintf(esc_html__('List %s in Revision Queue for "My Activity" or "Revisions to My Posts" view', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
+	'list_unsubmitted_revisions' => 			sprintf(esc_html__('List %s for "My Activity" or "Revisions to My Posts" view', 'revisionary'), pp_revisions_status_label('draft-revision', 'plural')),
 	'archive_postmeta' =>						esc_html__('Store custom fields of submitted and scheduled revisions for archive', 'revisionary'),
 	'extended_archive' =>						esc_html__('Keep an archive of revision edits, even after the revision is published', 'revisionary'),
 	'rev_publication_delete_ed_comments' =>		esc_html__('On Revision publication, delete Editorial Comments', 'revisionary'),
@@ -234,8 +236,11 @@ $this->option_captions = apply_filters('revisionary_option_captions',
 	'apply_post_exceptions' =>					esc_html__('Apply Post Permissions to Revisions', 'revisionary'),
 	'legacy_notifications' =>					esc_html__('Enable legacy email notifications', 'revisionary'),
 	'approve_button_verbose' =>					esc_html__('Use extended captions for Approve button in Post Editor', 'revisionary'),
+	'allow_post_author_revision' =>				esc_html__('Allow the Author field to be modified by Revision', 'revisionary'),
 	'create_revision_direct_link' =>			esc_html__('Create Revision button in editor opens new tab', 'revisionary'),
 	'revision_edit_disable_rank_math' => 		esc_html__('Disable Rank Math SEO panel for Revision edit', 'revisionary'),
+	'enable_postmeta_revision' =>				esc_html__('Allow custom fields (post meta) to be revisioned', 'revisionary'),
+	'submit_permission_enables_creation' =>		esc_html__('Permission for Submit Revision also enables Revision creation', 'revisionary'),
 	]
 );
 
@@ -255,10 +260,10 @@ $this->form_options = apply_filters('revisionary_option_sections', [
 	'post_types' =>			 ['enabled_post_types', 'enabled_post_types_archive'],
 	'statuses' => 			 [true],
 	'archive' =>			 ['num_revisions', 'archive_postmeta', 'extended_archive', 'revision_archive_deletion', 'revision_restore_require_cap', 'past_revisions_order_by'],
-	'working_copy' =>		 ['copy_posts_capability', 'revisor_role_add_custom_rolecaps', 'revision_limit_per_post', 'revision_limit_compat_mode', 'create_revision_direct_link', 'revision_unfiltered_html_check', 'auto_submit_revisions', 'caption_copy_as_edit', 'permissions_compat_mode', 'pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date', 'scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'wp_cron_usage_detected', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date', 'approve_button_verbose', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'rev_publication_delete_ed_comments', 'revision_statuses_noun_labels', 'revision_queue_capability', 'manage_unsubmitted_capability', 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions', 'deletion_queue', 'compare_revisions_direct_approval', 'use_publishpress_notifications', 'planner_notifications_access_limited', 'legacy_notifications', 'pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
+	'working_copy' =>		 ['copy_posts_capability', 'revisor_role_add_custom_rolecaps', 'revision_limit_per_post', 'revision_limit_compat_mode', 'submit_permission_enables_creation', 'allow_post_author_revision', 'create_revision_direct_link', 'revision_unfiltered_html_check', 'auto_submit_revisions', 'auto_submit_revisions_any_user', 'caption_copy_as_edit', 'permissions_compat_mode', 'pending_revisions', 'revise_posts_capability', 'pending_revision_update_post_date', 'pending_revision_update_modified_date', 'scheduled_revisions', 'scheduled_publish_cron', 'async_scheduled_publish', 'wp_cron_usage_detected', 'scheduled_revision_update_post_date', 'scheduled_revision_update_modified_date', 'approve_button_verbose', 'trigger_post_update_actions', 'copy_revision_comments_to_post', 'rev_publication_delete_ed_comments', 'revision_statuses_noun_labels', 'revision_queue_capability', 'manage_unsubmitted_capability', 'revisor_lock_others_revisions', 'revisor_hide_others_revisions', 'admin_revisions_to_own_posts', 'list_unsubmitted_revisions', 'deletion_queue', 'compare_revisions_direct_approval', 'use_publishpress_notifications', 'planner_notifications_access_limited', 'legacy_notifications', 'pending_rev_notify_admin', 'pending_rev_notify_author', 'revision_update_notifications', 'rev_approval_notify_admin', 'rev_approval_notify_author', 'rev_approval_notify_revisor', 'publish_scheduled_notify_admin', 'publish_scheduled_notify_author', 'publish_scheduled_notify_revisor', 'use_notification_buffer'],
 	'notifications' =>		 [true],
 	'integrations' =>		 [true],
-	'revisions'		=>		 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'home_preview_set_home_flag', 'require_edit_others_drafts', 'apply_post_exceptions', 'diff_display_strip_tags', 'revision_edit_disable_rank_math', 'display_hints', 'delete_settings_on_uninstall'],
+	'revisions'		=>		 ['revision_preview_links', 'preview_link_type', 'preview_link_alternate_preview_arg', 'home_preview_set_home_flag', 'require_edit_others_drafts', 'apply_post_exceptions', 'enable_postmeta_revision', 'diff_display_strip_tags', 'compare_revisions_hide_copy_buttons', 'revision_edit_disable_rank_math', 'display_hints', 'delete_settings_on_uninstall'],
 	'license' =>			 ['edd_key'],
 ]
 ]);
@@ -539,7 +544,7 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
         <?php 
 		echo $revisionary->admin->tooltipText(
 			'',
-			__('Past Revisions are earlier versions of a post. They are listed in the Revision Archive.', 'revisionary'),
+			__('Past Revisions are earlier versions of a post.', 'revisionary'),
 			true
 		);
 		?>
@@ -636,42 +641,19 @@ if (empty(array_filter($revisionary->enabled_post_types)) && empty(array_filter(
 		<?php 
 		echo $revisionary->admin->tooltipText(
 			'',
-			__('New Revisions are changes which are not yet published. They are listed in the Revision Queue.', 'revisionary'),
+			__('New Revisions are changes which are not yet published.', 'revisionary'),
 			true
 		);
 		?>
 		</h3>
 		<?php
-
-		$hidden_types = ['attachment' => false, 'psppnotif_workflow' => false, 'tablepress_table' => false, 'acf-field-group' => false, 'acf-field' => false, 'acf-post-type' => false, 'acf-taxonomy' => false, 'nav_menu_item' => false, 'custom_css' => false, 'customize_changeset' => false, 'wp_block' => false, 'wp_template' => false, 'wp_template_part' => false, 'wp_global_styles' => false, 'wp_navigation' => false, 'wp_font_family' => false, 'wp_font_face' => false, 'ppma_boxes' => false, 'ppmacf_field' => false, 'product_variation' => false, 'shop_order_refund' => false, 'wpcf7_contact_form' => false];
+		$hidden_types = $revisionary->getHiddenPostTypes();
 		$locked_types = [];
 
-		$types = get_post_types(['public' => true, 'show_ui' => true], 'object', 'or');
-
-		if (!defined('REVISIONARY_NO_PRIVATE_TYPES')) {
-			$available_private_types = [];
-			
-			$private_types = array_merge(
-				get_post_types(['public' => false], 'object'),
-				get_post_types(['public' => null], 'object')
-			);
-
-			// by default, enable non-public post types that have type-specific capabilities defined
-			foreach($private_types as $post_type => $type_obj) {
-				if ((!empty($type_obj->cap) && !empty($type_obj->cap->edit_posts) && !in_array($type_obj->cap->edit_posts, ['edit_posts', 'edit_pages']) && !in_array($post_type, $hidden_types))
-				|| defined('REVISIONARY_ENABLE_' . strtoupper($post_type) . '_TYPE')
-				) {
-					$available_private_types[$post_type] = $type_obj;
-				}
-			}
-
-			$available_private_types = array_intersect_key(
-				$available_private_types,
-				(array) apply_filters('revisionary_available_private_types', array_fill_keys(array_keys($available_private_types), true))
-			);
-
-			$types = array_merge($types, $available_private_types);
-		}
+		$types = array_merge(
+			get_post_types(['public' => true, 'show_ui' => true], 'object', 'or'),
+			$revisionary->getAvailablePrivatePostTypes()
+		);
 
 		$type_names = [];
 
@@ -863,9 +845,9 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	?>
 	<div class=agp-vspaced_input style="vertical-align: middle;">
 	<label for="<?php echo esc_html($option_name);?>">
-	<?php esc_html_e('Maximum revisions per post:', 'revisionary-pro');?></label>
+	<?php esc_html_e('Maximum revisions per post:', 'revisionary');?></label>
 	<input class="<?php echo esc_attr($class_name); ?>" name="<?php echo esc_attr($option_name); ?>" type="text" id="<?php echo esc_attr($option_name); ?>" size="10" 
-	value="<?php echo (in_array($opt_val, [true, ''], true)) ? '' : intval($opt_val);?>" placeholder="<?php echo (true === $wp_num_revisions) ? esc_html__('(unlimited)', 'revisionary-pro') : '';?>" 
+	value="<?php echo (in_array($opt_val, [true, ''], true)) ? '' : intval($opt_val);?>" placeholder="<?php echo (true === $wp_num_revisions) ? esc_html__('(unlimited)', 'revisionary') : '';?>" 
 	style="vertical-align:middle" autocomplete="off" />
 
 	<?php
@@ -873,7 +855,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		<div class="rvy-subtext">
 		<?php
 		printf(
-			esc_html__('Note that archiving can also be disabled by %1$sPost Type%2$s.', 'revisionary-pro'),
+			esc_html__('Note that archiving can also be disabled by %1$sPost Type%2$s.', 'revisionary'),
 			'<a class="rvyTabPostTypes" href="javascript:void(0)">',
 			'</a>'
 		);
@@ -973,7 +955,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		'revision-submission' => esc_html__('Submission', 'revisionary'),
 		'revision-scheduling' => esc_html__('Scheduling', 'revisionary'),
 		'revision-publication' => esc_html__('Publication', 'revisionary'),
-		'revision-queue' => esc_html__('Revision Queue', 'revisionary'),
+		'revision-queue' => esc_html__('Management', 'revisionary'),
 		'notifications' => esc_html__('Notifications', 'revisionary'),
 	];
 
@@ -1153,6 +1135,14 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 	</script>
 
 	<?php
+	if (defined('PRESSPERMIT_VERSION')) {
+		$hint = '';
+		$this->option_checkbox( 'submit_permission_enables_creation', $tab, $section, $hint, '');
+	}
+
+	$hint = '';
+	$this->option_checkbox( 'allow_post_author_revision', $tab, $section, $hint, '');
+
 	$hint = '';
 	$this->option_checkbox( 'create_revision_direct_link', $tab, $section, $hint, '');
 	?>
@@ -1179,7 +1169,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		$this->setSubsection('revision-submission');
 
 		$hint = sprintf(
-			esc_html__( 'Enable published content to be copied, edited, submitted for approval and managed in %sRevision Queue%s.', 'revisionary' ),
+			esc_html__( 'Enable published content to be copied, edited, submitted for approval and managed on the %sNew Revisions%s screen.', 'revisionary' ),
 			"<a href='" . esc_url(rvy_admin_url('admin.php?page=revisionary-q')) . "'>",
 			'</a>');
 
@@ -1222,7 +1212,10 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			$hint = sprintf(esc_html__( 'When a %s is published, update post modified date to current time.', 'revisionary' ), pp_revisions_status_label('pending-revision', 'name'));
 			$this->option_checkbox( 'pending_revision_update_modified_date', $tab, $section, $hint, '' );
 
-			$hint = esc_html__('When a user who has publishing capabilities creates a Revision, set it to "Submitted" status.', 'revisionary');
+			$hint = esc_html__('When a new revision is created by any user who is allowed to submit revisions, automatically submit it.', 'revisionary');
+			$this->option_checkbox( 'auto_submit_revisions_any_user', $tab, $section, $hint, '' );
+
+			$hint = esc_html__('Auto-submit revisions if the user can directly edit the main post.', 'revisionary');
 			$this->option_checkbox( 'auto_submit_revisions', $tab, $section, $hint, '' );
 
 			$hint = esc_html__('This allows immediate approval within the Compare screen. If disabled, a Preview link is provided instead.', 'revisionary');
@@ -1323,13 +1316,13 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 				}
 
 				$hint = sprintf(
-					__('Control Revision Queue access with the %s.', 'revisionary'),
+					__('Control New Revisions access with the %s.', 'revisionary'),
 					$link
 				);
 
 				$checkbox_args['no_escape'] = true;
 			} else {
-				$hint = esc_html__('Control Revision Queue access with the manage_revision_queue capability.', 'revisionary');
+				$hint = esc_html__('Control New Revisions access with the manage_revision_queue capability.', 'revisionary');
 			}
 
 			$this->option_checkbox('revision_queue_capability', $tab, $section, $hint, '', $checkbox_args);
@@ -1428,7 +1421,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 			<a href="<?php echo esc_url(wp_nonce_url(add_query_arg('rvy_flush_flags', 1, esc_url(esc_url_raw($_SERVER['REQUEST_URI']))), 'flush-flags') )?>"><?php esc_html_e('Regenerate "post has revision" flags', 'revisionary');?></a>
 			
 			<?php if ($this->display_hints) :
-				$hint = esc_html__('Apply this maintenance operation if Has Revision labels on Posts / Pages screens mismatch the Revision Queue listing.', 'revisionary');
+				$hint = esc_html__('Apply this maintenance operation if Has Revision labels on Posts / Pages screens mismatch the New Revisions listing.', 'revisionary');
 				echo "<div class='rvy-subtext'>" . esc_html($hint) . "</div>";
 			endif;?>
 		
@@ -1499,7 +1492,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 
 			$this->option_checkbox( 'use_publishpress_notifications', $tab, $section, $hint, '', $chk_args);
 
-			if ($pp_notifications && defined('PRESSPERMIT_VERSION') && defined('RVY_CONTENT_ROLES')) {
+			if ($pp_notifications && defined('PRESSPERMIT_VERSION') && defined('RVY_CONTENT_ROLES') && defined('PUBLISHPRESS_REVISIONS_PRO_VERSION')) {
 				echo '<br />';
 				$hint = __('Users matching Planner > Notifications configuration get revision notifications only if they can edit the published post.', 'revisionary');
 				$this->option_checkbox( 'planner_notifications_access_limited', $tab, $section, $hint, '', ['no_escape' => true] );
@@ -1526,10 +1519,6 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		<script type="text/javascript">
 		/* <![CDATA[ */
 		jQuery(document).ready( function($) {
-			$('#use_publishpress_notifications').on('click', function(e) {
-				$('div.rvy_legacy_email').toggle($(e).prop('checked'));
-			});
-
 			$('#legacy_notifications').on('click', function(e) {
 				$('div.rvy_legacy_email').toggle($(e).prop('checked'));
 			});
@@ -1537,7 +1526,7 @@ if ( ! empty( $this->form_options[$tab][$section] ) ) :?>
 		/* ]]> */
 		</script>
 
-		<div class="rvy_legacy_email" style="<?php if (!empty($pp_notifications) || empty($legacy_notifications)) echo 'display:none';?>">
+		<div class="rvy_legacy_email" style="<?php if (empty($legacy_notifications)) echo 'display:none';?>">
 
 		<?php
 		if( $pending_revisions_available ) {
@@ -1895,9 +1884,15 @@ if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !empty( $this->form_option
 			<?php
 		}
 		?>
-		<br><br>
 
 		<?php
+		$hint = __('This should usually be enabled, except to work around conflicts with other another plugin\'s postmeta data.', 'revisionary');
+		$this->option_checkbox('enable_postmeta_revision', $tab, $section, $hint, '');
+		?>
+
+		<br>
+		<?php
+
 		$checkbox_args = [];
 
 		if (defined('PUBLISHPRESS_CAPS_VERSION')) {
@@ -1934,6 +1929,9 @@ if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !empty( $this->form_option
 		$hint = '';
 		$this->option_checkbox( 'diff_display_strip_tags', $tab, $section, $hint, '' );
 
+		$hint = '';
+		$this->option_checkbox( 'compare_revisions_hide_copy_buttons', $tab, $section, $hint, '' );
+
 		if (class_exists('RankMath')) {
 			echo '<br>';
 			$hint = esc_html__('Rank Math SEO may prevent Revision update on some sites.', 'revisionary');
@@ -1965,7 +1963,7 @@ if (!defined('PUBLISHPRESS_REVISIONS_PRO_VERSION') && !empty( $this->form_option
 		$hint = esc_html__( 'Show descriptive captions for PublishPress Revisions settings.', 'revisionary' );
 		$this->option_checkbox( 'display_hints', $tab, $section, $hint, '' );
 
-		$hint = esc_html__('Plugin settings, Revision Queue contents and related data will be deleted, but only after the last copy of Revisions / Revisions Pro is deleted.', 'revisionary');
+		$hint = esc_html__('Plugin settings, New Revisions contents and related data will be deleted, but only after the last copy of Revisions / Revisions Pro is deleted.', 'revisionary');
 		$this->option_checkbox('delete_settings_on_uninstall', $tab, $section, $hint);
 		?>
 
