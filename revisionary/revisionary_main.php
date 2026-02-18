@@ -145,7 +145,7 @@ class Revisionary
 							('exclude' == $args['mod'])
 							&& rvy_get_option('apply_post_exceptions')
 							&& (
-								(($pagenow == 'admin.php') && isset($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-q', 'revisionary-archive']))
+								(($pagenow == 'admin.php') && isset($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-q', 'revisionary-archive']))	// //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 								|| (in_array($pagenow, ['post.php', 'post-new.php']) && rvy_in_revision_workflow(rvy_detect_post_id()))
 							)
 						) {
@@ -178,7 +178,7 @@ class Revisionary
 						if (
 							rvy_get_option('apply_post_exceptions')
 							&& (
-								(($pagenow == 'admin.php') && isset($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-q', 'revisionary-archive']))
+								(($pagenow == 'admin.php') && isset($_REQUEST['page']) && in_array($_REQUEST['page'], ['revisionary-q', 'revisionary-archive']))	// //phpcs:ignore WordPress.Security.NonceVerification.Recommended
 								|| (in_array($pagenow, ['post.php', 'post-new.php']) && rvy_in_revision_workflow(rvy_detect_post_id()))
 							)
 						) {
@@ -971,6 +971,7 @@ class Revisionary
 			if (function_exists('presspermit') && !rvy_get_option('submit_permission_enables_creation')) {
 				$pp_exceptions = presspermit()->getUser()->except;
 				
+				// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude
 				presspermit()->getUser()->except['revise_post'] = ['post' => ['' => ['include' => [], 'exclude' => [], 'additional' => ['page' => []]]]];
 
 				$can_copy = current_user_can('edit_post', $post_id);
