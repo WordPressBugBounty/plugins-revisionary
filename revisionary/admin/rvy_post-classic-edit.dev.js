@@ -209,7 +209,7 @@ jQuery(document).ready( function($) {
         }
         
         var dateStr = $('#mm').val() + '/' + $('#jj').val() + '/' + $('#aa').val() + ' ' +  $('#hh').val() + ':' + $('#mn').val() + ':00';
-        var selectedDate = new Date( dateStr );
+		var selectedDate = new Date( dateStr );
         
 		var currentDate = new Date();
 
